@@ -3,6 +3,7 @@ import minimalmodbus
 from tkinter import messagebox
 import csv
 import time
+import re
 
 list_modules = []  # хранилище адресов всех найденых модулей
 list_command = []  # хранилище всех команд на которые отвечают найденные модули
@@ -12,6 +13,7 @@ answers = []  # хранилище ответов от модулей
 active_parametrs = [True, True, True]  # хранилище значений галочек вкл свч, вкл ип, вкл питание
 flag_on_opros = True  # флаг активного обмена или паузы
 flag_sbros_avrii = False
+mask = re.compile(r':.+?(\\r\\n)')  #маска для выделения сообщения из мусора
 
 
 def find_port():
@@ -35,7 +37,7 @@ def find_port():
         port = str(ports.keys())[11:12]  # port.keys возвращает что-то типа (dict_keys([2])).
         # это надо перевести в строку, затем извлечь слайсом двойку
         # и передать двойку в port
-    port_open = serial.Serial('com{}'.format(port), 115200, timeout=0.1, stopbits=2, bytesize=7)  # для ардуино
+    port_open = serial.Serial('com{}'.format(port), 115200, timeout=0.1, stopbits=1, bytesize=8)  # для ардуино
                                                 # stopbits=1, bytesize=8 для всего остального stopbits=2, bytesize=7
 
 
@@ -47,21 +49,56 @@ def find_module():
     global list_modules_command_vkl
     if input('Выполниить поиск модулей (Y/N):') == 'Y':
         for i in range(128, 160):
-            LRC = hex(ord(minimalmodbus._calculateLrcString(hex(i)[2:].upper() + '4447000000')))[2:]
-            message = ':' + hex(i)[2:].upper() + '4447000000' + LRC.upper() + '\r\n'
+            LRC = hex(ord(minimalmodbus._calculateLrcString(hex(i)[2:].upper() + '445100000005')))[2:]
+            message = ':' + hex(i)[2:].upper() + '445100000005' + LRC.upper() + '\r\n'
             print(message)
             port_open.write(message.encode('ascii'))
-            otvet = repr(port_open.read(120))[1:]
+            otvet = repr(port_open.read(115))[1:]
             print(otvet)
-            if len(otvet) > 10:
+            if len(otvet) > 100:
                 list_modules += [otvet[2:4]]
                 active_module += [False]
+                list_command += ['51']
+                list_modules_command_vkl += ['00000005']
                 answers += [otvet]
-        if len(list_modules) == 0:
-            messagebox.showinfo('Ахтунг!', message='Модули не найдены')
-            # exit()
-        else:
-            indefikation_module()
+            else:
+                LRC = hex(ord(minimalmodbus._calculateLrcString(hex(i)[2:].upper() + '4449000000')))[2:]
+                message = ':' + hex(i)[2:].upper() + '4449000000' + LRC.upper() + '\r\n'
+                print(message)
+                port_open.write(message.encode('ascii'))
+                otvet = repr(port_open.read(80))[1:]
+                print(otvet)
+                if len(otvet) > 55:
+                    list_modules += [otvet[2:4]]
+                    active_module += [False]
+                    list_command += ['49']
+                    list_modules_command_vkl += ['000000']
+                    answers += [otvet]
+                else:
+                    LRC = hex(ord(minimalmodbus._calculateLrcString(hex(i)[2:].upper() + '4447000000')))[2:]
+                    message = ':' + hex(i)[2:].upper() + '4447000000' + LRC.upper() + '\r\n'
+                    print(message)
+                    port_open.write(message.encode('ascii'))
+                    otvet = repr(port_open.read(120))[1:]
+                    print(otvet)
+                    if len(otvet) > 10:
+                        list_modules += [otvet[2:4]]
+                        active_module += [False]
+                        list_command += ['47']
+                        list_modules_command_vkl += ['000000']
+                        answers += [otvet]
+        open('config.csv', 'w').close()  # после поиска всех модулей запишем результат в csv файл
+        print(answers)  # 1. очистим старый файл
+        for i in range(len(answers)):  # сократим ответы от модулей до двух символов
+            answers[i] = answers[i][2:4]
+        with open('config.csv', 'w', newline='') as file:  # откроем файл за запись и запишем 4 массива
+            file_write = csv.writer(file)
+            file_write.writerow(list_modules)
+            file_write.writerow(list_command)
+            file_write.writerow(list_modules_command_vkl)
+            file_write.writerow(answers)
+        print(list_modules)
+        print(list_command)
     else:                         # загрузим из файла предыдущий поиск модулей и их конфигурацию
         massive = []
         with open('config.csv', newline='') as file:
@@ -76,48 +113,6 @@ def find_module():
                 active_module += [False] # сконфигурируем массив для активных модулей
             print(list_modules)
             print(list_command)
-
-
-def indefikation_module():
-    global list_command
-    global answers
-    global list_modules_command_vkl
-    for i in range(len(list_modules)):
-        LRC = hex(ord(minimalmodbus._calculateLrcString(list_modules[i] + '445100000001')))[2:]
-        message = ':' + list_modules[i] + '445100000001' + LRC.upper() + '\r\n'
-        print(message)
-        port_open.write(message.encode('ascii'))
-        otvet = repr(port_open.read(115))[1:]
-        print(otvet)
-        if len(otvet) > 20:
-            list_command += ['51']
-            list_modules_command_vkl += ['00000005']
-            answers[i] = otvet
-        else:
-            LRC = hex(ord(minimalmodbus._calculateLrcString(list_modules[i] + '4449000000')))[2:]
-            message = ':' + list_modules[i] + '4449000000' + LRC.upper() + '\r\n'
-            print(message)
-            port_open.write(message.encode('ascii'))
-            otvet = repr(port_open.read(80))[1:]
-            if len(otvet) > 20:
-                list_command += ['49']
-                list_modules_command_vkl += ['000000']
-                answers[i] = otvet
-            else:
-                list_command += ['47']
-                list_modules_command_vkl += ['000000']
-    open('config.csv', 'w').close()  # после поиска всех модулей запишем результат в csv файл
-    print(answers)                        # 1. очистим старый файл
-    for i in range(len(answers)):         # сократим ответы от модулей до двух символов
-        answers[i] = answers[i][2:4]
-    with open('config.csv', 'w', newline='') as file:  # откроем файл за запись и запишем 4 массива
-        file_write = csv.writer(file)
-        file_write.writerow(list_modules)
-        file_write.writerow(list_command)
-        file_write.writerow(list_modules_command_vkl)
-        file_write.writerow(answers)
-    print(list_modules)
-    print(list_command)
 
 
 def obmen():
@@ -135,14 +130,18 @@ def obmen():
                           LRC.upper() + '\r\n'
                 print(message)
                 port_open.write(message.encode('ascii'))
-                ans = repr(port_open.read(120))[1:]
-                if ans[1] == ':' and ans[-2] == 'n' and ans[-4] == 'r':
-                    if hex(ord(minimalmodbus._calculateLrcString(ans[2:-7])))[2:].upper() == ans[-7:-5]:
-                        answers[i] = ans
-                        print(answers[i])
+                ans = repr(port_open.read(120))#[1:]
+                try:  # попытка отсеить лишние байты перед двоеточием
+                    # ans = 'b' + ans[ans.index(':'):]
+                    ans = mask.search(ans).group()
+                except:
+                    ans = 'not correct'
+                print(ans)
+                if ans[0] == ':' and ans[-1] == 'n' and ans[-3] == 'r':
+                    if int(hex(ord(minimalmodbus._calculateLrcString(ans[1:-6])))[2:].upper(), 16) == int(ans[-6:-4], 16):
+                        answers[i] = 'b' + ans  # тут б для того чтобы удобно было выбирать байты из ответов
                     else:
                         answers[i] = ''
-                        print(answers[i])
                 else:
                     answers[i] = ''
                     print(answers[i])
