@@ -2,6 +2,7 @@ import tkinter
 import threading
 import opros
 import time
+shift_Y = 70  # константа сдвига элементов окна по вертикали
 
 
 def full_information_of_module(type_window, what_module):
@@ -20,10 +21,9 @@ def create_string_KSs(KS):
 
 
 def window47(what_module):
-    global P_mirrow
     window_47 = tkinter.Tk()
     window_47.title('Параметры {} модуля'.format(what_module+1))
-    window_47.geometry('430x430')
+    window_47.geometry('430x500')
 
     param_label = tkinter.Label(window_47, justify='right', text='Серийный номер:\n\n'
                                                                  'Версия прошивки:\n\n'
@@ -37,7 +37,8 @@ def window47(what_module):
                                                                  'Текущий код фазы:\n\n'
                                                                  'Заводской код фазы:\n\n'
                                                                  'Контрольное слово:')
-    state_label1 = tkinter.Label(window_47, justify='center', text='Состояние модуля\nпо контрольному слову', font='Verdana 8 bold')
+    state_label1 = tkinter.Label(window_47, justify='center', text='Состояние модуля\n'
+                                                                   'по контрольному слову', font='Verdana 8 bold')
     state_label2 = tkinter.Label(window_47, justify='right', text='Сеть ВКЛ\n\n'
                                                                  'ИП ВКЛ\n\n'
                                                                  'СВЧ тракт открыт\n\n'
@@ -50,6 +51,14 @@ def window47(what_module):
                                                                  'Нет имп.упр\n\n'
                                                                  'Авария пит.\n\n'
                                                                  'Неиспр. датчик tºC')
+    state_label3 = tkinter.Label(window_47, justify='right', text='Тип модуля:\n'
+                                                                  'Изготовитель:\n'
+                                                                  'Версия ПО:\n'
+                                                                  'Модуль ')
+    increment_phase = tkinter.Label(window_47, text='Приращение фазы')
+    increment_phase_plus = tkinter.Button(window_47, text='+')
+    increment_phase_minus = tkinter.Button(window_47, text='-')
+    globals()['phase_increment{}'.format(what_module)] = tkinter.Label(window_47, text='FF')
     ksb1 = tkinter.Label(window_47, text='Первый байт')
     ksb2 = tkinter.Label(window_47, text='Второй байт:')
     granica = tkinter.Canvas(window_47, width=3, height=400, bg='black')
@@ -70,35 +79,40 @@ def window47(what_module):
     globals()['code_fi{}'.format(what_module)] = tkinter.Label(window_47, text='FF')
     globals()['code_fi_man{}'.format(what_module)] = tkinter.Label(window_47, text='FF')
 
-    param_label.place(x=0, y=20)
+
+    param_label.place(x=0, y=20+shift_Y)
     state_label1.place(x=250, y=5)
     state_label2.place(x=230, y=40)
-    ksb1.place(x=53, y=372)
-    ksb2.place(x=53, y=392)
+    state_label3.place(x=10, y=5)
+    increment_phase.place(x=250, y=352+shift_Y)
+    increment_phase_plus.place(x=260, y=372+shift_Y)
+    increment_phase_minus.place(x=320, y=372+shift_Y)
+    globals()['phase_increment{}'.format(what_module)].place(x=290, y=372+shift_Y)
+    ksb1.place(x=53, y=372+shift_Y)
+    ksb2.place(x=53, y=392+shift_Y)
     granica.place(x=220, y=0)
     for i in range(12):
         globals()['state{}{}'.format(i, what_module)].place(x=360, y=40 + i * 30)
 
-    globals()['s_number{}'.format(what_module)].place(x=170, y=20)
-    globals()['version_p{}'.format(what_module)].place(x=170, y=51)
-    globals()['time_work{}'.format(what_module)].place(x=170, y=82)
-    globals()['time_work_min{}'.format(what_module)].place(x=170, y=112)
-    globals()['temperature{}'.format(what_module)].place(x=170, y=142)
-    globals()['voltage{}'.format(what_module)].place(x=170, y=172)
-    globals()['KS1b1{}'.format(what_module)].place(x=140, y=372)
-    globals()['KS1b2{}'.format(what_module)].place(x=140, y=392)
-    globals()['P_in{}'.format(what_module)].place(x=170, y=202)
-    globals()['P_out{}'.format(what_module)].place(x=170, y=232)
-    globals()['P_mirrow{}'.format(what_module)].place(x=170, y=262)
-    globals()['code_fi{}'.format(what_module)].place(x=170, y=292)
-    globals()['code_fi_man{}'.format(what_module)].place(x=170, y=322)
-    globals()['update47{}'.format(what_module)] = threading.Thread(target=update_window_47, args=str(what_module), daemon=True)
-    globals()['update47{}'.format(what_module)].start()
+    globals()['s_number{}'.format(what_module)].place(x=170, y=20+shift_Y)
+    globals()['version_p{}'.format(what_module)].place(x=170, y=51+shift_Y)
+    globals()['time_work{}'.format(what_module)].place(x=170, y=82+shift_Y)
+    globals()['time_work_min{}'.format(what_module)].place(x=170, y=112+shift_Y)
+    globals()['temperature{}'.format(what_module)].place(x=170, y=142+shift_Y)
+    globals()['voltage{}'.format(what_module)].place(x=170, y=172+shift_Y)
+    globals()['KS1b1{}'.format(what_module)].place(x=140, y=372+shift_Y)
+    globals()['KS1b2{}'.format(what_module)].place(x=140, y=392+shift_Y)
+    globals()['P_in{}'.format(what_module)].place(x=170, y=202+shift_Y)
+    globals()['P_out{}'.format(what_module)].place(x=170, y=232+shift_Y)
+    globals()['P_mirrow{}'.format(what_module)].place(x=170, y=262+shift_Y)
+    globals()['code_fi{}'.format(what_module)].place(x=170, y=292+shift_Y)
+    globals()['code_fi_man{}'.format(what_module)].place(x=170, y=322+shift_Y)
+    globals()['update47{}'.format(what_module)] = threading.Thread(target=update_window_47, args=(what_module,), daemon=True)  # тут должна быть запятая в аrgs, иначе слетает поток при числах больше 9.
+    globals()['update47{}'.format(what_module)].start()                                                                        # поток думает что аргументов 2 или более
     window_47.mainloop()
 
 
 def window49(what_module):
-    global P_mirrow_1
     window_49 = tkinter.Tk()
     window_49.title('Параметры {} модуля'.format(what_module+1))
     window_49.geometry('520x600')
@@ -139,8 +153,15 @@ def window49(what_module):
                                                                   'Нет имп.упр\n\n'
                                                                   'Авария пит.\n\n'
                                                                   'Неиспр. датчик tºC')
-
-    granica = tkinter.Canvas(window_49, width=3, height=470, bg='black')
+    increment_phase1 = tkinter.Label(window_49, text='Приращение фазы\n1 канала')
+    increment_phase1_plus = tkinter.Button(window_49, text='+')
+    increment_phase1_minus = tkinter.Button(window_49, text='-')
+    globals()['phase_increment1{}'.format(what_module)] = tkinter.Label(window_49, text='FF')
+    increment_phase2 = tkinter.Label(window_49, text='Приращение фазы\n2 канала')
+    increment_phase2_plus = tkinter.Button(window_49, text='+')
+    increment_phase2_minus = tkinter.Button(window_49, text='-')
+    globals()['phase_increment2{}'.format(what_module)] = tkinter.Label(window_49, text='FF')
+    granica = tkinter.Canvas(window_49, width=3, height=570, bg='black')
     for i in range(12):
         globals()['state_ks1_49{}{}'.format(i, what_module)]= tkinter.Canvas(window_49, width=20, height=20, bg='blue')
     for i in range(12):
@@ -179,6 +200,14 @@ def window49(what_module):
     channels_label_3.place(x=70, y=481)
     state_label1.place(x=300, y=5)
     state_label2.place(x=270, y=80)
+    increment_phase1.place(x=270, y=496)
+    increment_phase1_plus.place(x=280, y=536)
+    increment_phase1_minus.place(x=340, y=536)
+    globals()['phase_increment1{}'.format(what_module)].place(x=310, y=536)
+    increment_phase2.place(x=390, y=496)
+    increment_phase2_plus.place(x=400, y=536)
+    increment_phase2_minus.place(x=460, y=536)
+    globals()['phase_increment2{}'.format(what_module)].place(x=430, y=536)
     granica.place(x=260, y=0)
     for i in range(12):
         globals()['state_ks1_49{}{}'.format(i, what_module)].place(x=420, y=80 + i * 30)
@@ -210,14 +239,13 @@ def window49(what_module):
     globals()['code_att_man_1{}'.format(what_module)].place(x=170, y=431)
     globals()['code_att_2{}'.format(what_module)].place(x=230, y=401)
     globals()['code_att_man_2{}'.format(what_module)].place(x=230, y=431)
-    globals()['update49{}'.format(what_module)] = threading.Thread(target=update_window_49, args=str(what_module),
+    globals()['update49{}'.format(what_module)] = threading.Thread(target=update_window_49, args=(what_module,),
                                                                    daemon=True)
     globals()['update49{}'.format(what_module)].start()
     window_49.mainloop()
 
 
 def window51(what_module):
-    global P_mirrow_2
     window_51 = tkinter.Tk()
     window_51.title('Параметры {} модуля'.format(what_module+1))
     window_51.geometry('800x480')
@@ -271,10 +299,14 @@ def window51(what_module):
     globals()['temperature{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
     globals()['time_work_min{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
     globals()['voltage{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
-    globals()['KS_1{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
-    globals()['KS_2{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
-    globals()['KS_3{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
-    globals()['KS_4{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
+    globals()['KS_1b1{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
+    globals()['KS_2b1{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
+    globals()['KS_3b1{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
+    globals()['KS_4b1{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
+    globals()['KS_1b2{}'.format(what_module)] = tkinter.Label(window_51, text='FF', bd=0)
+    globals()['KS_2b2{}'.format(what_module)] = tkinter.Label(window_51, text='FF', bd=0)
+    globals()['KS_3b2{}'.format(what_module)] = tkinter.Label(window_51, text='FF', bd=0)
+    globals()['KS_4b2{}'.format(what_module)] = tkinter.Label(window_51, text='FF', bd=0)
     globals()['P_in_1{}'.format(what_module)] = tkinter.Label(window_51, text='O_o')
     globals()['P_out_1{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
     globals()['P_mirrow_1{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
@@ -304,6 +336,7 @@ def window51(what_module):
     globals()['code_att_4{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
     globals()['code_att_man_4{}'.format(what_module)] = tkinter.Label(window_51, text='FF')
 
+
     param_label.place(x=0, y=20)
     channels_label_1.place(x=190, y=207)
     channels_label_2.place(x=240, y=50)
@@ -327,10 +360,15 @@ def window51(what_module):
     globals()['temperature{}'.format(what_module)].place(x=170, y=142)
     globals()['voltage{}'.format(what_module)].place(x=170, y=172)
     KS_label.place(x=250, y=20)
-    globals()['KS_1{}'.format(what_module)].place(x=300, y=50)
-    globals()['KS_2{}'.format(what_module)].place(x=300, y=80)
-    globals()['KS_3{}'.format(what_module)].place(x=300, y=110)
-    globals()['KS_4{}'.format(what_module)].place(x=300, y=140)
+    globals()['KS_1b1{}'.format(what_module)].place(x=300, y=50)
+    globals()['KS_2b1{}'.format(what_module)].place(x=300, y=78)
+    globals()['KS_3b1{}'.format(what_module)].place(x=300, y=106)
+    globals()['KS_4b1{}'.format(what_module)].place(x=300, y=134)
+    globals()['KS_1b2{}'.format(what_module)].place(x=300, y=65)
+    globals()['KS_2b2{}'.format(what_module)].place(x=300, y=93)
+    globals()['KS_3b2{}'.format(what_module)].place(x=300, y=121)
+    globals()['KS_4b2{}'.format(what_module)].place(x=300, y=149)
+
     globals()['P_in_1{}'.format(what_module)].place(x=200, y=232)
     globals()['P_out_1{}'.format(what_module)].place(x=200, y=262)
     globals()['P_mirrow_1{}'.format(what_module)].place(x=200, y=292)
@@ -359,7 +397,7 @@ def window51(what_module):
     globals()['code_att_man_3{}'.format(what_module)].place(x=320, y=442)
     globals()['code_att_4{}'.format(what_module)].place(x=375, y=412)
     globals()['code_att_man_4{}'.format(what_module)].place(x=375, y=442)
-    globals()['update51{}'.format(what_module)] = threading.Thread(target=update_window_51, args=(str(what_module)),
+    globals()['update51{}'.format(what_module)] = threading.Thread(target=update_window_51, args=(what_module,),
                                                                    daemon=True)
     globals()['update51{}'.format(what_module)].start()
     window_51.mainloop()
@@ -367,21 +405,21 @@ def window51(what_module):
 
 def update_window_47(what_module):
     while True:
-        if len(opros.answers[int(what_module)]) > 10:
-            globals()['s_number{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][26:32], 16)
-            globals()['version_p{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][38:40], 16)
-            globals()['time_work{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][32:36], 16)
-            globals()['temperature{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][14:16], 16)
-            globals()['time_work_min{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][36:38], 16)
-            globals()['voltage{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][16:18], 16)
-            globals()['P_in{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][8:10], 16)
-            globals()['P_out{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][10:12], 16)
-            globals()['P_mirrow{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][12:14], 16)
-            globals()['code_fi{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][22:24], 16)
-            globals()['code_fi_man{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][24:26], 16)
+        if opros.list_command[what_module] == '47' and (len(opros.answers[what_module]) == 48 or len(opros.answers[what_module]) == 46):  # для модулей 46 байтов
+            globals()['s_number{}'.format(what_module)]['text'] = int(opros.answers[what_module][26:32], 16)
+            globals()['version_p{}'.format(what_module)]['text'] = int(opros.answers[what_module][38:40], 16)
+            globals()['time_work{}'.format(what_module)]['text'] = int(opros.answers[what_module][32:36], 16)
+            globals()['temperature{}'.format(what_module)]['text'] = int(opros.answers[what_module][14:16], 16)
+            globals()['time_work_min{}'.format(what_module)]['text'] = int(opros.answers[what_module][36:38], 16)
+            globals()['voltage{}'.format(what_module)]['text'] = int(opros.answers[what_module][16:18], 16)
+            globals()['P_in{}'.format(what_module)]['text'] = int(opros.answers[what_module][8:10], 16)
+            globals()['P_out{}'.format(what_module)]['text'] = int(opros.answers[what_module][10:12], 16)
+            globals()['P_mirrow{}'.format(what_module)]['text'] = int(opros.answers[what_module][12:14], 16)
+            globals()['code_fi{}'.format(what_module)]['text'] = int(opros.answers[what_module][22:24], 16)
+            globals()['code_fi_man{}'.format(what_module)]['text'] = int(opros.answers[what_module][24:26], 16)
 
-            ksb1 = create_string_KSs(opros.answers[int(what_module)][18:20])  # обработка аварийных байтов
-            ksb2 = create_string_KSs(opros.answers[int(what_module)][20:22])
+            ksb1 = create_string_KSs(opros.answers[what_module][18:20])  # обработка аварийных байтов
+            ksb2 = create_string_KSs(opros.answers[what_module][20:22])
             globals()['KS1b1{}'.format(what_module)]['text'] = ksb1
             globals()['KS1b2{}'.format(what_module)]['text'] = ksb2
             for i in range(-1, -4, -1):
@@ -399,6 +437,39 @@ def update_window_47(what_module):
                     globals()['state{}{}'.format(-i-1, what_module)]['bg'] = 'green'
                 else:
                     globals()['state{}{}'.format(-i-1, what_module)]['bg'] = 'Red'
+        elif opros.list_command[what_module] == '51' and len(opros.answers[what_module]) == 54:
+            globals()['s_number{}'.format(what_module)]['text'] = int(opros.answers[what_module][14:22], 16)
+            globals()['version_p{}'.format(what_module)]['text'] = int(opros.answers[what_module][28:30], 16)
+            globals()['time_work{}'.format(what_module)]['text'] = int(opros.answers[what_module][22:26], 16)
+            globals()['temperature{}'.format(what_module)]['text'] = int(opros.answers[what_module][10:12], 16)
+            globals()['time_work_min{}'.format(what_module)]['text'] = int(opros.answers[what_module][26:28],
+                                                                           16)
+            globals()['voltage{}'.format(what_module)]['text'] = int(opros.answers[what_module][12:14], 16)
+            globals()['P_in{}'.format(what_module)]['text'] = int(opros.answers[what_module][30:32], 16)
+            globals()['P_out{}'.format(what_module)]['text'] = int(opros.answers[what_module][32:34], 16)
+            globals()['P_mirrow{}'.format(what_module)]['text'] = int(opros.answers[what_module][34:36], 16)
+            globals()['code_fi{}'.format(what_module)]['text'] = int(opros.answers[what_module][40:42], 16)
+            globals()['code_fi_man{}'.format(what_module)]['text'] = int(opros.answers[what_module][42:44], 16)
+
+            ksb1 = create_string_KSs(opros.answers[what_module][36:38])  # обработка аварийных байтов
+            ksb2 = create_string_KSs(opros.answers[what_module][38:40])
+            globals()['KS1b1{}'.format(what_module)]['text'] = ksb1
+            globals()['KS1b2{}'.format(what_module)]['text'] = ksb2
+            for i in range(-1, -4, -1):
+                if ksb2[i] == '1':
+                    globals()['state{}{}'.format(-i - 1, what_module)]['bg'] = 'green'
+                else:
+                    globals()['state{}{}'.format(-i - 1, what_module)]['bg'] = 'blue'
+            for i in range(-4, -9, -1):
+                if ksb2[i] == '0':
+                    globals()['state{}{}'.format(-i - 1, what_module)]['bg'] = 'green'
+                else:
+                    globals()['state{}{}'.format(-i - 1, what_module)]['bg'] = 'Red'
+            for i in range(-9, -13, -1):
+                if ksb1[i + 8] == '0':
+                    globals()['state{}{}'.format(-i - 1, what_module)]['bg'] = 'green'
+                else:
+                    globals()['state{}{}'.format(-i - 1, what_module)]['bg'] = 'Red'
         else:
             globals()['s_number{}'.format(what_module)]['text'] = '(¬_¬) не отвечает'
             globals()['s_number{}'.format(what_module)]['fg'] = 'red'
@@ -409,18 +480,18 @@ def update_window_47(what_module):
 
 def update_window_49(what_module):
     while True:
-        if len(opros.answers[int(what_module)]) > 10:
-            globals()['s_number{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][48:54], 16)
-            globals()['version_p{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][60:62], 16)
-            globals()['time_work{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][54:58], 16)
-            globals()['temperature{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][14:16], 16)
-            globals()['time_work_min{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][58:60], 16)
-            globals()['voltage{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][16:18], 16)
+        if opros.list_command[what_module] == '49' and len(opros.answers[what_module]) == 68:
+            globals()['s_number{}'.format(what_module)]['text'] = int(opros.answers[what_module][48:54], 16)
+            globals()['version_p{}'.format(what_module)]['text'] = int(opros.answers[what_module][60:62], 16)
+            globals()['time_work{}'.format(what_module)]['text'] = int(opros.answers[what_module][54:58], 16)
+            globals()['temperature{}'.format(what_module)]['text'] = int(opros.answers[what_module][14:16], 16)
+            globals()['time_work_min{}'.format(what_module)]['text'] = int(opros.answers[what_module][58:60], 16)
+            globals()['voltage{}'.format(what_module)]['text'] = int(opros.answers[what_module][16:18], 16)
 
-            ks1b1 = create_string_KSs(opros.answers[int(what_module)][18:20])  # обработка аварийных байтов
-            ks1b2 = create_string_KSs(opros.answers[int(what_module)][20:22])
-            ks2b1 = create_string_KSs(opros.answers[int(what_module)][36:38])
-            ks2b2 = create_string_KSs(opros.answers[int(what_module)][38:40])
+            ks1b1 = create_string_KSs(opros.answers[what_module][18:20])  # обработка аварийных байтов
+            ks1b2 = create_string_KSs(opros.answers[what_module][20:22])
+            ks2b1 = create_string_KSs(opros.answers[what_module][36:38])
+            ks2b2 = create_string_KSs(opros.answers[what_module][38:40])
             globals()['KS_1b1{}'.format(what_module)]['text'] = ks1b1
             globals()['KS_1b2{}'.format(what_module)]['text'] = ks1b2
             globals()['KS_2b1{}'.format(what_module)]['text'] = ks2b1
@@ -458,20 +529,88 @@ def update_window_49(what_module):
                 else:
                     globals()['state_ks2_49{}{}'.format(-i-1, what_module)]['bg'] = 'Red'
 
-            globals()['P_in_1{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][8:10], 16)
-            globals()['P_out_1{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][10:12], 16)
-            globals()['P_mirrow_1{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][12:14], 16)
-            globals()['P_in_2{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][30:32], 16)
-            globals()['P_out_2{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][32:34], 16)
-            globals()['P_mirrow_2{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][34:36], 16)
-            globals()['code_fi_1{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][22:24], 16)
-            globals()['code_fi_man_1{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][24:26], 16)
-            globals()['code_fi_2{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][40:42], 16)
-            globals()['code_fi_man_2{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][42:44], 16)
-            globals()['code_att_1{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][26:28], 16)
-            globals()['code_att_man_1{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][28:30], 16)
-            globals()['code_att_2{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][44:46], 16)
-            globals()['code_att_man_2{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][46:48], 16)
+            globals()['P_in_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][8:10], 16)
+            globals()['P_out_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][10:12], 16)
+            globals()['P_mirrow_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][12:14], 16)
+            globals()['P_in_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][30:32], 16)
+            globals()['P_out_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][32:34], 16)
+            globals()['P_mirrow_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][34:36], 16)
+            globals()['code_fi_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][22:24], 16)
+            globals()['code_fi_man_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][24:26], 16)
+            globals()['code_fi_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][40:42], 16)
+            globals()['code_fi_man_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][42:44], 16)
+            globals()['code_att_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][26:28], 16)
+            globals()['code_att_man_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][28:30], 16)
+            globals()['code_att_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][44:46], 16)
+            globals()['code_att_man_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][46:48], 16)
+        elif opros.list_command[what_module] == '51' and len(opros.answers[what_module]) == 72:
+            globals()['s_number{}'.format(what_module)]['text'] = int(opros.answers[what_module][14:22], 16)
+            globals()['version_p{}'.format(what_module)]['text'] = int(opros.answers[what_module][28:30], 16)
+            globals()['time_work{}'.format(what_module)]['text'] = int(opros.answers[what_module][22:26], 16)
+            globals()['temperature{}'.format(what_module)]['text'] = int(opros.answers[what_module][10:12], 16)
+            globals()['time_work_min{}'.format(what_module)]['text'] = int(opros.answers[what_module][26:28],
+                                                                           16)
+            globals()['voltage{}'.format(what_module)]['text'] = int(opros.answers[what_module][12:14], 16)
+
+            ks1b1 = create_string_KSs(opros.answers[what_module][36:38])  # обработка аварийных байтов
+            ks1b2 = create_string_KSs(opros.answers[what_module][38:40])
+            ks2b1 = create_string_KSs(opros.answers[what_module][54:56])
+            ks2b2 = create_string_KSs(opros.answers[what_module][56:58])
+            globals()['KS_1b1{}'.format(what_module)]['text'] = ks1b1
+            globals()['KS_1b2{}'.format(what_module)]['text'] = ks1b2
+            globals()['KS_2b1{}'.format(what_module)]['text'] = ks2b1
+            globals()['KS_2b2{}'.format(what_module)]['text'] = ks2b2
+            '''Первый столбик'''
+            for i in range(-1, -4, -1):
+                if ks1b2[i] == '1':
+                    globals()['state_ks1_49{}{}'.format(-i - 1, what_module)]['bg'] = 'green'
+                else:
+                    globals()['state_ks1_49{}{}'.format(-i - 1, what_module)]['bg'] = 'blue'
+            for i in range(-4, -9, -1):
+                if ks1b2[i] == '0':
+                    globals()['state_ks1_49{}{}'.format(-i - 1, what_module)]['bg'] = 'green'
+                else:
+                    globals()['state_ks1_49{}{}'.format(-i - 1, what_module)]['bg'] = 'Red'
+            for i in range(-9, -13, -1):
+                if ks1b1[i + 8] == '0':
+                    globals()['state_ks1_49{}{}'.format(-i - 1, what_module)]['bg'] = 'green'
+                else:
+                    globals()['state_ks1_49{}{}'.format(-i - 1, what_module)]['bg'] = 'Red'
+            '''Второй столбик'''
+            for i in range(-1, -4, -1):
+                if ks2b2[i] == '1':
+                    globals()['state_ks2_49{}{}'.format(-i - 1, what_module)]['bg'] = 'green'
+                else:
+                    globals()['state_ks2_49{}{}'.format(-i - 1, what_module)]['bg'] = 'blue'
+            for i in range(-4, -9, -1):
+                if ks2b2[i] == '0':
+                    globals()['state_ks2_49{}{}'.format(-i - 1, what_module)]['bg'] = 'green'
+                else:
+                    globals()['state_ks2_49{}{}'.format(-i - 1, what_module)]['bg'] = 'Red'
+            for i in range(-9, -13, -1):
+                if ks2b1[i + 8] == '0':
+                    globals()['state_ks2_49{}{}'.format(-i - 1, what_module)]['bg'] = 'green'
+                else:
+                    globals()['state_ks2_49{}{}'.format(-i - 1, what_module)]['bg'] = 'Red'
+
+            globals()['P_in_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][30:32], 16)
+            globals()['P_out_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][32:34], 16)
+            globals()['P_mirrow_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][34:36], 16)
+            globals()['P_in_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][48:50], 16)
+            globals()['P_out_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][50:52], 16)
+            globals()['P_mirrow_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][52:54], 16)
+            globals()['code_fi_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][40:42], 16)
+            globals()['code_fi_man_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][42:44],
+                                                                           16)
+            globals()['code_fi_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][58:60], 16)
+            globals()['code_fi_man_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][60:62],
+                                                                           16)
+            globals()['code_att_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][44:46], 16)
+            globals()['code_att_man_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][46:48],
+                                                                            16)
+            globals()['code_att_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][62:64], 16)
+            globals()['code_att_man_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][64:66],
+                                                                            16)
         else:
             globals()['temperature{}'.format(what_module)]['text'] = '(ノ º□º)ノ ⌒ ┴----┴'
             globals()['version_p{}'.format(what_module)]['text'] = '¯\(°_0)/¯'
@@ -482,26 +621,31 @@ def update_window_49(what_module):
 
 def update_window_51(what_module):
     while True:
-        if len(opros.answers[int(what_module)]) > 10:
-            globals()['s_number{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][14:22], 16)
-            globals()['version_p{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][28:30], 16)
-            globals()['time_work{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][22:26], 16)
-            globals()['temperature{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][10:12], 16)
-            globals()['time_work_min{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][26:28], 16)
-            globals()['voltage{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][12:14], 16)
+        if len(opros.answers[what_module]) > 10:
+            globals()['s_number{}'.format(what_module)]['text'] = int(opros.answers[what_module][14:22], 16)
+            globals()['version_p{}'.format(what_module)]['text'] = int(opros.answers[what_module][28:30], 16)
+            globals()['time_work{}'.format(what_module)]['text'] = int(opros.answers[what_module][22:26], 16)
+            globals()['temperature{}'.format(what_module)]['text'] = int(opros.answers[what_module][10:12], 16)
+            globals()['time_work_min{}'.format(what_module)]['text'] = int(opros.answers[what_module][26:28], 16)
+            globals()['voltage{}'.format(what_module)]['text'] = int(opros.answers[what_module][12:14], 16)
 
-            ks1b1 = create_string_KSs(opros.answers[int(what_module)][36:38])  # обработка аварийных байтов
-            ks1b2 = create_string_KSs(opros.answers[int(what_module)][38:40])
-            ks2b1 = create_string_KSs(opros.answers[int(what_module)][54:56])
-            ks2b2 = create_string_KSs(opros.answers[int(what_module)][56:58])
-            ks3b1 = create_string_KSs(opros.answers[int(what_module)][72:74])
-            ks3b2 = create_string_KSs(opros.answers[int(what_module)][74:76])
-            ks4b1 = create_string_KSs(opros.answers[int(what_module)][90:92])
-            ks4b2 = create_string_KSs(opros.answers[int(what_module)][92:94])
-            globals()['KS_1{}'.format(what_module)]['text'] = bin(int(opros.answers[int(what_module)][36:40], 16))
-            globals()['KS_2{}'.format(what_module)]['text'] = bin(int(opros.answers[int(what_module)][54:58], 16))
-            globals()['KS_3{}'.format(what_module)]['text'] = bin(int(opros.answers[int(what_module)][72:76], 16))
-            globals()['KS_4{}'.format(what_module)]['text'] = bin(int(opros.answers[int(what_module)][90:94], 16))
+            ks1b1 = create_string_KSs(opros.answers[what_module][36:38])  # обработка аварийных байтов
+            ks1b2 = create_string_KSs(opros.answers[what_module][38:40])
+            ks2b1 = create_string_KSs(opros.answers[what_module][54:56])
+            ks2b2 = create_string_KSs(opros.answers[what_module][56:58])
+            ks3b1 = create_string_KSs(opros.answers[what_module][72:74])
+            ks3b2 = create_string_KSs(opros.answers[what_module][74:76])
+            ks4b1 = create_string_KSs(opros.answers[what_module][90:92])
+            ks4b2 = create_string_KSs(opros.answers[what_module][92:94])
+            globals()['KS_1b1{}'.format(what_module)]['text'] = ks1b1
+            globals()['KS_2b1{}'.format(what_module)]['text'] = ks2b1
+            globals()['KS_3b1{}'.format(what_module)]['text'] = ks3b1
+            globals()['KS_4b1{}'.format(what_module)]['text'] = ks4b1
+            globals()['KS_1b2{}'.format(what_module)]['text'] = ks1b2
+            globals()['KS_2b2{}'.format(what_module)]['text'] = ks4b2
+            globals()['KS_3b2{}'.format(what_module)]['text'] = ks3b2
+            globals()['KS_4b2{}'.format(what_module)]['text'] = ks4b2
+
             '''Первый столбик'''
             for i in range(-1, -4, -1):
                 if ks1b2[i] == '1':
@@ -567,40 +711,40 @@ def update_window_51(what_module):
                 else:
                     globals()['state_ks4_51{}{}'.format(-i-1, what_module)]['bg'] = 'Red'
 
-            globals()['P_in_1{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][30:32], 16)
-            globals()['P_out_1{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][32:34], 16)
-            globals()['P_mirrow_1{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][34:36], 16)
-            globals()['P_in_2{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][48:50], 16)
-            globals()['P_out_2{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][50:52], 16)
-            globals()['P_mirrow_2{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][52:54], 16)
-            globals()['P_in_3{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][66:68], 16)
-            globals()['P_out_3{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][68:70], 16)
-            globals()['P_mirrow_3{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][70:72], 16)
-            globals()['P_in_4{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][84:86], 16)
-            globals()['P_out_4{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][86:88], 16)
-            globals()['P_mirrow_4{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][88:90], 16)
-            globals()['code_fi_1{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][40:42], 16)
-            globals()['code_fi_man_1{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][42:44], 16)
-            globals()['code_fi_2{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][58:60], 16)
-            globals()['code_fi_man_2{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][60:62], 16)
-            globals()['code_fi_3{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][76:78], 16)
-            globals()['code_fi_man_3{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][78:80], 16)
-            globals()['code_fi_41{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][94:96], 16)
-            globals()['code_fi_man_4{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][96:98], 16)
-            globals()['code_att_1{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][44:46], 16)
-            globals()['code_att_man_1{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][46:48], 16)
-            globals()['code_att_2{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][62:64], 16)
-            globals()['code_att_man_2{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][64:66], 16)
-            globals()['code_att_3{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][80:82], 16)
-            globals()['code_att_man_3{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][82:84], 16)
-            globals()['code_att_4{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][98:100], 16)
-            globals()['code_att_man_4{}'.format(what_module)]['text'] = int(opros.answers[int(what_module)][100:102],
+            globals()['P_in_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][30:32], 16)
+            globals()['P_out_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][32:34], 16)
+            globals()['P_mirrow_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][34:36], 16)
+            globals()['P_in_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][48:50], 16)
+            globals()['P_out_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][50:52], 16)
+            globals()['P_mirrow_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][52:54], 16)
+            globals()['P_in_3{}'.format(what_module)]['text'] = int(opros.answers[what_module][66:68], 16)
+            globals()['P_out_3{}'.format(what_module)]['text'] = int(opros.answers[what_module][68:70], 16)
+            globals()['P_mirrow_3{}'.format(what_module)]['text'] = int(opros.answers[what_module][70:72], 16)
+            globals()['P_in_4{}'.format(what_module)]['text'] = int(opros.answers[what_module][84:86], 16)
+            globals()['P_out_4{}'.format(what_module)]['text'] = int(opros.answers[what_module][86:88], 16)
+            globals()['P_mirrow_4{}'.format(what_module)]['text'] = int(opros.answers[what_module][88:90], 16)
+            globals()['code_fi_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][40:42], 16)
+            globals()['code_fi_man_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][42:44], 16)
+            globals()['code_fi_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][58:60], 16)
+            globals()['code_fi_man_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][60:62], 16)
+            globals()['code_fi_3{}'.format(what_module)]['text'] = int(opros.answers[what_module][76:78], 16)
+            globals()['code_fi_man_3{}'.format(what_module)]['text'] = int(opros.answers[what_module][78:80], 16)
+            globals()['code_fi_41{}'.format(what_module)]['text'] = int(opros.answers[what_module][94:96], 16)
+            globals()['code_fi_man_4{}'.format(what_module)]['text'] = int(opros.answers[what_module][96:98], 16)
+            globals()['code_att_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][44:46], 16)
+            globals()['code_att_man_1{}'.format(what_module)]['text'] = int(opros.answers[what_module][46:48], 16)
+            globals()['code_att_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][62:64], 16)
+            globals()['code_att_man_2{}'.format(what_module)]['text'] = int(opros.answers[what_module][64:66], 16)
+            globals()['code_att_3{}'.format(what_module)]['text'] = int(opros.answers[what_module][80:82], 16)
+            globals()['code_att_man_3{}'.format(what_module)]['text'] = int(opros.answers[what_module][82:84], 16)
+            globals()['code_att_4{}'.format(what_module)]['text'] = int(opros.answers[what_module][98:100], 16)
+            globals()['code_att_man_4{}'.format(what_module)]['text'] = int(opros.answers[what_module][100:102],
                                                                             16)
         else:
-            globals()['KS_1{}'.format(what_module)]['text'] = '(ノ º□º)ノ ⌒ ┴----┴'
-            globals()['KS_2{}'.format(what_module)]['text'] = '¯\(°_0)/¯'
-            globals()['KS_3{}'.format(what_module)]['text'] = 'обмена нет'
-            globals()['KS_3{}'.format(what_module)]['fg'] = 'red'
+            globals()['KS_1b1{}'.format(what_module)]['text'] = '(ノ º□º)ノ ⌒ ┴----┴'
+            globals()['KS_2b1{}'.format(what_module)]['text'] = '¯\(°_0)/¯'
+            globals()['KS_3b1{}'.format(what_module)]['text'] = 'обмена нет'
+            globals()['KS_4b1{}'.format(what_module)]['fg'] = 'red'
         time.sleep(0.1)
 
 

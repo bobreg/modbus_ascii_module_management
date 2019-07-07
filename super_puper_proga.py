@@ -3,14 +3,14 @@ import opros
 import param_module
 import time
 import threading
+import start
 
 general_shift = 50 # переменная для сдвига всех элементов по вертикали
 
 flag_cheks = True  # флаг для того чтобы ставить и снимать галочки на всех модулях
+flag_cheks_on_51 = True  # флаг для того чтобы ставить и снимать галочки на всех модулях при активации 51 команды
 flag_vkl_vikl_active_module = False
 
-opros.find_port()
-opros.find_module()
 
 number_of_modules = len(opros.list_modules)
 
@@ -26,6 +26,25 @@ def all_vum_use():
             globals()['check{}'.format(j)].deselect()
             opros.active_module[j - 1] = False
     flag_cheks = not flag_cheks
+
+
+def all_vum_on_51():
+    global flag_cheks_on_51
+    if flag_cheks_on_51 is True:
+        for j in range(1, number_of_modules + 1):
+            globals()['check_51{}'.format(j)].select()
+            if opros.list_command[j-1] == '47':
+                opros.list_command[j-1] = '51'
+                opros.list_modules_command_vkl[j-1] = '00000002'
+            elif opros.list_command[j-1] == '49':
+                opros.list_command[j-1] = '51'
+                opros.list_modules_command_vkl[j-1] = '00000003'
+    else:
+        for j in range(1, number_of_modules + 1):
+            globals()['check_51{}'.format(j)].deselect()
+            opros.list_command[j-1] = opros.list_command_buffer[j-1]
+            opros.list_modules_command_vkl[j-1] = opros.list_modules_command_vkl_buffer[j-1]
+    flag_cheks_on_51 = not flag_cheks_on_51
 
 
 def update_window():
@@ -57,7 +76,7 @@ def update_window():
                         globals()['mod{}_opros'.format(i + 1)]['fg'] = 'green'
                     else:
                         avaria_47(ansvers[i][18:22], i)
-                if ansvers[i][6:8] == '49':
+                elif ansvers[i][6:8] == '49':
                     if ansvers[i][18:22] == '0007' and ansvers[i][36:40] == '0007':
                         globals()['work{}_opros'.format(i + 1)]['text'] = 'норм'
                         globals()['work{}_opros'.format(i + 1)]['fg'] = 'green'
@@ -74,7 +93,41 @@ def update_window():
                         globals()['mod{}_opros'.format(i + 1)]['fg'] = 'green'
                     else:
                         avaria_49(ansvers[i][18:22], ansvers[i][36:40], i)
-                if ansvers[i][6:8] == '51':
+                elif ansvers[i][6:8] == '51' and ansvers[i][8:10] == '02':
+                    if ansvers[i][36:40] == '0007':
+                        globals()['work{}_opros'.format(i + 1)]['text'] = 'норм'
+                        globals()['work{}_opros'.format(i + 1)]['fg'] = 'green'
+                        globals()['pitan{}_opros'.format(i + 1)]['text'] = 'норм'
+                        globals()['pitan{}_opros'.format(i + 1)]['fg'] = 'green'
+                        globals()['mod{}_opros'.format(i + 1)]['text'] = 'норм'
+                        globals()['mod{}_opros'.format(i + 1)]['fg'] = 'green'
+                    elif int(ansvers[i][36:40], 16) < 7:
+                        globals()['work{}_opros'.format(i + 1)]['text'] = 'Откл'
+                        globals()['work{}_opros'.format(i + 1)]['fg'] = 'blue'
+                        globals()['pitan{}_opros'.format(i + 1)]['text'] = 'норм'
+                        globals()['pitan{}_opros'.format(i + 1)]['fg'] = 'green'
+                        globals()['mod{}_opros'.format(i + 1)]['text'] = 'норм'
+                        globals()['mod{}_opros'.format(i + 1)]['fg'] = 'green'
+                    else:
+                        avaria_51(ansvers[i][36:40], '0000', '0000', '0000', i)
+                elif ansvers[i][6:8] == '51' and ansvers[i][8:10] == '03':
+                    if ansvers[i][36:40] == '0007' and ansvers[i][54:58] == '0000':
+                        globals()['work{}_opros'.format(i + 1)]['text'] = 'норм'
+                        globals()['work{}_opros'.format(i + 1)]['fg'] = 'green'
+                        globals()['pitan{}_opros'.format(i + 1)]['text'] = 'норм'
+                        globals()['pitan{}_opros'.format(i + 1)]['fg'] = 'green'
+                        globals()['mod{}_opros'.format(i + 1)]['text'] = 'норм'
+                        globals()['mod{}_opros'.format(i + 1)]['fg'] = 'green'
+                    elif int(ansvers[i][36:40], 16) < 7:
+                        globals()['work{}_opros'.format(i + 1)]['text'] = 'Откл'
+                        globals()['work{}_opros'.format(i + 1)]['fg'] = 'blue'
+                        globals()['pitan{}_opros'.format(i + 1)]['text'] = 'норм'
+                        globals()['pitan{}_opros'.format(i + 1)]['fg'] = 'green'
+                        globals()['mod{}_opros'.format(i + 1)]['text'] = 'норм'
+                        globals()['mod{}_opros'.format(i + 1)]['fg'] = 'green'
+                    else:
+                        avaria_51(ansvers[i][36:40], ansvers[i][54:58], '0000', '0000', i)
+                elif ansvers[i][6:8] == '51' and ansvers[i][8:10] == '05':
                     if ansvers[i][36:40] == '0007' and ansvers[i][54:58] == '0000' and ansvers[i][72:76] == '0000' \
                                                                                    and ansvers[i][90:94] == '0000':
                         globals()['work{}_opros'.format(i + 1)]['text'] = 'норм'
@@ -92,6 +145,9 @@ def update_window():
                         globals()['mod{}_opros'.format(i + 1)]['fg'] = 'green'
                     else:
                         avaria_51(ansvers[i][36:40], ansvers[i][54:58], ansvers[i][72:76], ansvers[i][90:94], i)
+                else:
+                    globals()['work{}_opros'.format(i + 1)]['fg'] = 'orange'
+                    globals()['work{}_opros'.format(i + 1)]['text'] = 'аномалия'
         time.sleep(0.1)
 
 
@@ -324,6 +380,22 @@ def sbros_avarii():
     opros.flag_sbros_avrii = True
 
 
+def sent_51_in_module(s):
+    if opros.list_command[s] == '47':
+        opros.list_command[s] = '51'
+        opros.list_modules_command_vkl[s] = '00000002'
+    elif opros.list_command[s] == '49':
+        opros.list_command[s] = '51'
+        opros.list_modules_command_vkl[s] = '00000003'
+    elif opros.list_command[s] == '51':
+        opros.list_command[s] = opros.list_command_buffer[s]
+        opros.list_modules_command_vkl[s] = opros.list_modules_command_vkl_buffer[s]
+
+
+def scroll_def(event):
+    canvas.configure(scrollregion=canvas.bbox('all'))
+
+
 thread_opros = threading.Thread(target=opros.obmen, daemon=True)
 thread_update_window = threading.Thread(target=update_window, daemon=True)
 
@@ -331,54 +403,77 @@ thread_update_window = threading.Thread(target=update_window, daemon=True)
 window = tkinter.Tk()
 window.title("Универсальная программа")
 
-adress_label = tkinter.Label(window, text='Адрес\nмодуля', font='Gothice 8')
-activate_control_label = tkinter.Label(window, text='Активировать\nуправление', font='Gothice 8')
-general_state_label = tkinter.Label(window, text='Общее состояние модулей', font='Gothice 14')
-с1 = tkinter.Canvas(window, width=2, height=35*number_of_modules+25, bg='snow3')
-с2 = tkinter.Canvas(window, width=2, height=35*number_of_modules+25, bg='snow3')
+if number_of_modules <= 16:
+    window.geometry(str(760) + 'x' + str(35 * (number_of_modules + 1) + 150) + '+300+0')
+    canvas = tkinter.Canvas(window, width=750, height=35*(number_of_modules + 1) + 150)
+    frame_for_elements = tkinter.Frame(canvas, width=750, height=35 * (number_of_modules + 1) + 150)
+    frame_for_elements.place(x=0, y=0)
+else:
+    window.geometry(str(760) + 'x' + str(730) + '+300+0')
+    canvas = tkinter.Canvas(window, width=750, height=730, bg='green')
+    frame_for_elements = tkinter.Frame(canvas, width=750, height=35 * (number_of_modules + 1) + 150)
+    scroll = tkinter.Scrollbar(window, command=canvas.yview)
+    canvas['yscrollcommand'] = scroll.set
+    scroll.pack(side='right', fill='y')
+    canvas.create_window((0, 0), window=frame_for_elements, anchor='nw')
+    window.bind('<Configure>', scroll_def)
+
+
+
+
+adress_label = tkinter.Label(frame_for_elements, text='Адрес\nмодуля', font='Gothice 8')
+activate_control_label = tkinter.Label(frame_for_elements, text='Активировать\nуправление', font='Gothice 8')
+general_state_label = tkinter.Label(frame_for_elements, text='Общее состояние модулей', font='Gothice 14')
+on_51_in_modules = tkinter.Label(frame_for_elements, text='Опрашивать\n51 командой', font='Gothice 8')
+c1 = tkinter.Canvas(frame_for_elements, width=2, height=35*number_of_modules+25, bg='snow3')
+c2 = tkinter.Canvas(frame_for_elements, width=2, height=35*number_of_modules+25, bg='snow3')
+c3 = tkinter.Canvas(frame_for_elements, width=2, height=35*number_of_modules+25, bg='snow3')
 
 for i in range(0, number_of_modules):
-    locals()['adress_module{}'.format(i+1)] = tkinter.Label(window, text='{}'.format(opros.list_modules[i]))
+    locals()['adress_module{}'.format(i+1)] = tkinter.Label(frame_for_elements, text='{}'.format(opros.list_modules[i]))
 for i in range(0, number_of_modules):
-    locals()['module{}'.format(i+1)] = tkinter.Label(window, text='модуль {}'.format(i+1))
+    locals()['module{}'.format(i+1)] = tkinter.Label(frame_for_elements, text='модуль {}'.format(i+1))
 for i in range(0, number_of_modules):
-    locals()['button{}'.format(i+1)] = tkinter.Button(window, text='параметры',
+    locals()['button{}'.format(i+1)] = tkinter.Button(frame_for_elements, text='параметры',
                                                       command=lambda type_window=opros.list_command[i],
                                                       how_module=i:
                                                       param_module.full_information_of_module(type_window, how_module))
 for i in range(0, number_of_modules):
-    globals()['check{}'.format(i+1)] = tkinter.Checkbutton(window,
+    globals()['check{}'.format(i+1)] = tkinter.Checkbutton(frame_for_elements,
                                                            command=lambda b=i: choise_active_module(b))
+for i in range(0, number_of_modules):
+    globals()['check_51{}'.format(i+1)] = tkinter.Checkbutton(frame_for_elements,
+                                                           command=lambda s=i: sent_51_in_module(s))
+for i in range(0, number_of_modules):
+    locals()['work{}'.format(i+1)] = tkinter.Label(frame_for_elements, text='Работа:')
+for i in range(0, number_of_modules):
+    globals()['work{}_opros'.format(i+1)] = tkinter.Label(frame_for_elements, text='0_о', fg='red')
 
 for i in range(0, number_of_modules):
-    locals()['work{}'.format(i+1)] = tkinter.Label(window, text='Работа:')
+    locals()['pitan{}'.format(i+1)] = tkinter.Label(frame_for_elements, text='Питание:')
 for i in range(0, number_of_modules):
-    globals()['work{}_opros'.format(i+1)] = tkinter.Label(window, text='0_о', fg='red')
+    globals()['pitan{}_opros'.format(i+1)] = tkinter.Label(frame_for_elements, text='0_о', fg='red')
 
 for i in range(0, number_of_modules):
-    locals()['pitan{}'.format(i+1)] = tkinter.Label(window, text='Питание:')
+    locals()['mod{}'.format(i+1)] = tkinter.Label(frame_for_elements, text='Модуляция:')
 for i in range(0, number_of_modules):
-    globals()['pitan{}_opros'.format(i+1)] = tkinter.Label(window, text='0_о', fg='red')
+    globals()['mod{}_opros'.format(i+1)] = tkinter.Label(frame_for_elements, text='0_о', fg='red')
 
-for i in range(0, number_of_modules):
-    locals()['mod{}'.format(i+1)] = tkinter.Label(window, text='Модуляция:')
-for i in range(0, number_of_modules):
-    globals()['mod{}_opros'.format(i+1)] = tkinter.Label(window, text='0_о', fg='red')
-
-button_vkl_vikl = tkinter.Button(window, text='ВКЛ', width=10, heigh=2, font='arial 15', bg='snow3',
+button_vkl_vikl = tkinter.Button(frame_for_elements, text='ВКЛ', width=10, heigh=2, font='arial 15', bg='snow3',
                                  command=vkl_vikl_active_module)
-sbros = tkinter.Button(window, text='Сброс\nаварии', width=10, heigh=2, font='arial 15', bg='snow3',
+sbros = tkinter.Button(frame_for_elements, text='Сброс\nаварии', width=10, heigh=2, font='arial 15', bg='snow3',
                        command=sbros_avarii)
 
-vkl_vikl_pitan = tkinter.Checkbutton(window, command=vkl_pitan)
-vkl_vikl_ip = tkinter.Checkbutton(window, command=vkl_ip)
-vkl_vikl_svch = tkinter.Checkbutton(window, command=vkl_svch)
-chooise_all = tkinter.Checkbutton(window, text='выбрать все\nмодули', command=all_vum_use)
-stop_obmen = tkinter.Checkbutton(window, text='стоп обмен', command=stop_obmen)
+vkl_vikl_pitan = tkinter.Checkbutton(frame_for_elements, command=vkl_pitan)
+vkl_vikl_ip = tkinter.Checkbutton(frame_for_elements, command=vkl_ip)
+vkl_vikl_svch = tkinter.Checkbutton(frame_for_elements, command=vkl_svch)
+chooise_all = tkinter.Checkbutton(frame_for_elements, text='выбрать все\nмодули', command=all_vum_use)
+stop_obmen = tkinter.Checkbutton(frame_for_elements, text='стоп обмен', command=stop_obmen)
+chooise_all_on_51 = tkinter.Checkbutton(frame_for_elements, text='все', command=all_vum_on_51)
 
-vkl_vikl_pitan_label = tkinter.Label(window, text='Сеть')
-vkl_vikl_ip_label = tkinter.Label(window, text='ИП')
-vkl_vikl_svch_label = tkinter.Label(window, text='СВЧ')
+vkl_vikl_pitan_label = tkinter.Label(frame_for_elements, text='Сеть')
+vkl_vikl_ip_label = tkinter.Label(frame_for_elements, text='ИП')
+vkl_vikl_svch_label = tkinter.Label(frame_for_elements, text='СВЧ')
 
 vkl_vikl_svch.select()
 vkl_vikl_ip.select()
@@ -386,11 +481,16 @@ vkl_vikl_pitan.select()
 
 '''размещение элементов'''
 
+canvas.place(x=0, y=0)
+
+
 adress_label.place(x=5, y=5)
 activate_control_label.place(x=140, y=5)
 general_state_label.place(x=300, y=5)
-с1.place(x=115, y=10)
-с2.place(x=250, y=10)
+on_51_in_modules.place(x=655, y=5)
+c1.place(x=115, y=10)
+c2.place(x=250, y=10)
+c3.place(x=640, y=10)
 
 for i in range(1, number_of_modules+1):
     locals()['adress_module{}'.format(i)].place(x=15, y=35*(i-1)+general_shift)
@@ -400,6 +500,8 @@ for i in range(1, number_of_modules+1):
     locals()['button{}'.format(i)].place(x=160, y=35*(i-1)+general_shift)
 for i in range(1, number_of_modules+1):
     locals()['check{}'.format(i)].place(x=130, y=35*(i-1)+general_shift)
+for i in range(1, number_of_modules+1):
+    locals()['check_51{}'.format(i)].place(x=680, y=35*(i-1)+general_shift)
 
 for i in range(1, number_of_modules+1):
     locals()['work{}'.format(i)].place(x=270, y=35*(i-1)+general_shift)
@@ -427,10 +529,9 @@ vkl_vikl_ip_label.place(x=100, y=35*number_of_modules+80+general_shift)
 vkl_vikl_svch_label.place(x=140, y=35*number_of_modules+80+general_shift)
 chooise_all.place(x=200, y=35*number_of_modules+80+general_shift)
 stop_obmen.place(x=400, y=35*number_of_modules+80+general_shift)
+chooise_all_on_51.place(x=680, y=35*number_of_modules+general_shift)
 
 thread_update_window.start()
 thread_opros.start()
-
-window.geometry(str(750) + 'x' + str(35*(number_of_modules + 1) + 150) + '+300+10')
 
 window.mainloop()
